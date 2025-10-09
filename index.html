@@ -10,21 +10,41 @@
 <body>
     <div class="wrapper">
         <div class="card">
-            <h1><span>TikTok</span> Downloader</h1>
-            <p>Download videos without watermark instantly.</p>
-            <div class="input-group">
-                <input type="text" id="url" placeholder="Paste TikTok link here...">
-                <button id="downloadBtn">Download</button>
+            <h1 id="mainHeading"><span>TikTok</span> Downloader</h1>
+            <p id="subHeading">Download TikTok videos or images without watermark instantly.</p>
+
+            <div class="tabs">
+                <button class="tab-button active" data-tab="video">Video</button>
+                <button class="tab-button" data-tab="images">Images</button>
             </div>
+
+            <!-- Video Form -->
+            <form id="videoForm" onsubmit="document.getElementById('downloadVideoBtn').click(); return false;">
+                <div class="input-group">
+                    <input type="text" id="videoUrl" placeholder="Paste TikTok video link here...">
+                    <button type="button" id="downloadVideoBtn">Download Video</button>
+                </div>
+            </form>
+
+            <!-- Images Form -->
+            <form id="imagesForm" onsubmit="document.getElementById('downloadImagesBtn').click(); return false;" style="display:none;">
+                <div class="input-group">
+                    <input type="text" id="imagesUrl" placeholder="Paste TikTok images link here...">
+                    <button type="button" id="downloadImagesBtn">Download Images</button>
+                </div>
+            </form>
+
             <div id="result"></div>
         </div>
     </div>
+
     <footer>
         &copy; <span id="year"></span> TikTok Video Downloader<br>
-        Made with ❤️ by Jenit Lal Shakya<br>
+        Made with ❤️ by <strong>Jenit Lal Shakya</strong><br>
         Not affiliated with TikTok or ByteDance Ltd.<br>
         All rights to original videos belong to their respective owners.<br>
     </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
