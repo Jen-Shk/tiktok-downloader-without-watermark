@@ -292,7 +292,9 @@ button:focus-visible {
 .tab-button.active {
     background: linear-gradient(135deg, var(--accent), #e60046);
     color: #fff;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 16px rgba(230, 0, 70, 0.35);
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
 }
 
 .tab-button:hover {
