@@ -56,10 +56,21 @@ document.addEventListener('DOMContentLoaded', () => {
             resultDiv.innerHTML = `
                 <p class="video-title">${title}</p>
                 <video controls src="${videoUrl}" style="width:100%; border-radius:10px;"></video>
-                <button id="downloadVideo">Download Video Without Watermark</button>
+                <button id="downloadVideo">
+                    <span class="btn-text">Download Video Without Watermark</span>
+                    <span class="spinner" style="display: none;"></span>
+                </button>
             `;
 
-            document.getElementById('downloadVideo').onclick = async () => {
+            const videoDownloadBtn = document.getElementById('downloadVideo');
+            const videoBtnText = videoDownloadBtn.querySelector('.btn-text');
+            const videoSpinner = videoDownloadBtn.querySelector('.spinner');
+
+            videoDownloadBtn.onclick = async () => {
+                videoDownloadBtn.disable = true;
+                videoSpinner.style.display = "inline-block";
+                videoBtnText.textContent = "Downloading...";
+
                 try {
                     const fileName = title.replace(/[^\w\s]/gi, '_').substring(0, 40) + ".mp4";
                     const response = await fetch(videoUrl);
@@ -74,6 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch (err) {
                     alert("Failed to download video. Please try again.");
                     console.error(err);
+                } finally {
+                    videoDownloadBtn.disable = false;
+                    videoSpinner.style.display = "none";
+                    videoBtnText.textContent = "Download Video Without Watermark"
                 }
             };
 
@@ -126,14 +141,24 @@ document.addEventListener('DOMContentLoaded', () => {
             resultDiv.innerHTML = `<p class="video-title">${title} (Images)</p>`;
             resultDiv.appendChild(container);
 
-            const btnDownloadImages = document.createElement('button');
-            btnDownloadImages.textContent = 'Download Selected Images';
-            btnDownloadImages.style.marginTop = '10px';
-            resultDiv.appendChild(btnDownloadImages);
+            const imageDownloadBtn = document.createElement('button');
+            imageDownloadBtn.innerHTML = `
+                <span class="btn-text">Download Selected Images</span>
+                <span class="spinner" style="display: none;"</span>
+            `;
+            imageDownloadBtn.style.marginTop = '10px';
+            resultDiv.appendChild(imageDownloadBtn);
 
-            btnDownloadImages.onclick = async () => {
+            const imageBtnText = imageDownloadBtn.querySelector('.btn-text');
+            const imageSpinner = imageDownloadBtn.querySelector('.spinner');
+
+            imageDownloadBtn.onclick = async () => {
                 const selectedImages = checkboxes.filter(c => c.checkbox.checked);
                 if (selectedImages.length === 0) return alert('Please select at least one image!');
+
+                imageDownloadBtn.disabled = true;
+                imageSpinner.style.display = "inline-block";
+                imageBtnText.textContent = "Downloading...";
 
                 for (let i = 0; i < selectedImages.length; i++) {
                     try {
@@ -152,6 +177,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert('Failed to download one of the images. Please try again.');
                     }
                 }
+
+                imageDownloadBtn.disabled = false;
+                imageSpinner.style.display = "none";
+                imageBtnText.textContent = "Download Selected Images";
             };
 
         } catch (err) {

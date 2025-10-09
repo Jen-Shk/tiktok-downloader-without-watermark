@@ -301,6 +301,36 @@ button:focus-visible {
     filter: brightness(1.1);
 }
 
+#downloadVideo {
+    background-color: var(--accent);
+    color: var(--text);
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+    margin-top: 10px;
+}
+
+#downloadVideo:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+  
+.spinner {
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-top: 3px solid #fff;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    margin-left: 8px;
+    animation: spin 1s linear infinite;
+}
+
 footer {
     text-align: center;
     color: var(--text);
@@ -309,6 +339,11 @@ footer {
     margin-top: auto;
     line-height: 1.5;
     opacity: 0.8;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 @keyframes fadeIn {
