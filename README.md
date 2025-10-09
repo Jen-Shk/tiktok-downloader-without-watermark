@@ -1,44 +1,47 @@
-# TikTok Video Downloader (Without Watermark)
+# TikTok Video & Image Downloader (Without Watermark)
 
-A simple and fast web application to download TikTok videos **without watermark**. Just paste the video link, and get your video instantly!
+A simple and fast web application to download **TikTok videos and images without watermark**. Just paste the link, and get your content instantly!
 
-## Try it here
-👉 [Live Demo](https://jen-shk.github.io/tiktok-video-downloader-without-watermark/)
+## 🚀 Features
 
-## Features
-
-- ✅ Download TikTok videos without watermark
+- ✅ Download **TikTok videos without watermark**
+- ✅ Download **TikTok images (photo posts)**
 - ✅ User-friendly and minimal interface
-- ✅ Works on desktop and mobile browsers
+- ✅ Works on both desktop and mobile browsers
 - ✅ Fast and reliable
 
-## How to Use
+## 📥 How to Use
 
-1. Open the website.
-2. Copy the TikTok video link you want to download.
+1. Open the [Live Demo](https://jen-shk.github.io/tiktok-video-downloader-without-watermark/).
+2. Copy the **TikTok video or image post link** you want to download.
 3. Paste the link into the input box.
 4. Click the **Download** button.
-5. The video will be saved directly to your device.
+5. Your video or image(s) will be saved directly to your device.
 
-## Demo
+## 🖼 Demo
 
 *(Optional: Add a GIF or screenshot of your website here to showcase it.)*
 
-## Built With
+## 🛠 Built With
 
 - HTML5
 - CSS3
 - JavaScript
 
-## Contributing
+## 🤝 Contributing
 
-Contributions are welcome! If you have ideas or improvements, feel free to open an issue or submit a pull request.
+Contributions are welcome!  
+If you have ideas, improvements, or bug fixes, feel free to:
+- Open an issue
+- Submit a pull request
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE).
 
-## Disclaimer
+## ⚠️ Disclaimer
 
 - This tool is for **personal use only**.
 - Do **not** use this website to download copyrighted content without permission.
+- We are **not affiliated with TikTok** in any way.
+
