@@ -12,7 +12,7 @@ A simple and fast web application to download **TikTok videos and images without
 
 ## 📥 How to Use
 
-1. Open the [Live Demo](https://jen-shk.github.io/tiktok-video-downloader-without-watermark/).
+1. Open the [Live Demo](https://jen-shk.github.io/tiktok-downloader-without-watermark/).
 2. Copy the **TikTok video or image post link** you want to download.
 3. Paste the link into the input box.
 4. Click the **Download** button.
