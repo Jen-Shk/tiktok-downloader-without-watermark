@@ -3,41 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Downloader</title>
+    <title>TikTok Downloader - Videos & Images</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="images/download.png">
 </head>
 <body>
     <div class="wrapper">
-        <div class="card">
-            <h1 id="mainHeading"><span>TikTok</span> Downloader</h1>
-            <p id="subHeading">Download TikTok videos or images without watermark instantly.</p>
-
-            <div class="tabs">
-                <button class="tab-button active" data-tab="video">Video</button>
-                <button class="tab-button" data-tab="images">Images</button>
-            </div>
-
-            <!-- Video Form -->
-            <form id="videoForm" onsubmit="document.getElementById('downloadVideoBtn').click(); return false;">
+        <div class="container">
+                <h1><span>TikTok</span> Video & Image Downloader</h1>
+                <p>Enter a TikTok URL (video or photo post) to download.</p>
                 <div class="input-group">
-                    <input type="text" id="videoUrl" placeholder="Paste TikTok video link here...">
-                    <button type="button" id="downloadVideoBtn">Download Video</button>
+                    <input type="url" id="tiktokUrl" placeholder="https://www.tiktok.com/@username/video/123456789" required>
+                    <button type="button" id="pasteBtn">📋 Paste</button>
                 </div>
-            </form>
-
-            <!-- Images Form -->
-            <form id="imagesForm" onsubmit="document.getElementById('downloadImagesBtn').click(); return false;" style="display:none;">
-                <div class="input-group">
-                    <input type="text" id="imagesUrl" placeholder="Paste TikTok images link here...">
-                    <button type="button" id="downloadImagesBtn">Download Images</button>
-                </div>
-            </form>
-
-            <div id="result"></div>
+                <button type="button" id="fetchBtn">Download</button>
+                <div id="results"></div>
         </div>
     </div>
 
+    <!-- Footer -->
     <footer>
         &copy; <span id="year"></span> TikTok Video Downloader<br>
         Made with ❤️ by <strong>Jenit Lal Shakya</strong><br>

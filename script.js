@@ -1,194 +1,225 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const tabs = document.querySelectorAll('.tab-button');
-    const videoForm = document.getElementById('videoForm');
-    const imagesForm = document.getElementById('imagesForm');
-    const mainHeading = document.getElementById('mainHeading');
-    const subHeading = document.getElementById('subHeading');
-    const resultDiv = document.getElementById('result');
-    
-    let activeTab = 'video';
-    
-    // Function to update tabs
-    function updateTab(tab) {
-        if(tab === 'video') {
-            videoForm.style.display = 'block';
-            imagesForm.style.display = 'none';
-            mainHeading.innerHTML = '<span>TikTok</span> Video Downloader';
-            subHeading.textContent = 'Download TikTok videos without watermark instantly.';
-        } else {
-            videoForm.style.display = 'none';
-            imagesForm.style.display = 'block';
-            mainHeading.innerHTML = '<span>TikTok</span> Image Downloader';
-            subHeading.textContent = 'Download TikTok images without watermark instantly.';
+document.addEventListener("DOMContentLoaded", () => {
+    async function downloadContent() {
+        const url = document.getElementById('tiktokUrl').value.trim();
+
+        if (!url) {
+            alert('Please Enter a TikTok URL');
+            return;
         }
-        activeTab = tab;
-        resultDiv.innerHTML = '';
+
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = '<p class="loading">Fetching data...</p>';
+        const button = document.getElementById('fetchBtn');
+        button.disabled = true;
+        button.textContent = "Fetching...";
+
+        try {
+            const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error('API request failed!');
+            }
+
+            const data = await response.json();
+
+            if (data.code !== 0) {
+                throw new Error(data.msg || 'Invalid TikTok URL or API error');
+            }
+
+            const content = data.data;
+            const username = content.author?.unique_id? `@${content.author.unique_id}` : '@unknown_user';
+            const videoId = content.id || 'unknown_id';
+
+            resultsDiv.innerHTML = '<div class="note">Preview and download your TikTok video or images below.</div>';
+
+            // Handle Images (TikTok photo posts)
+            if (content.images && content.images.length > 0) {
+                const imageSection = document.createElement('div');
+                imageSection.className = 'image-section';
+                imageSection.innerHTML = '<h3>Image Previews:</h3>';
+
+                // Horizontal scroll container
+                const scrollContainer = document.createElement('div');
+                scrollContainer.className = 'image-scroll-container';
+
+                content.images.forEach((imgUrl, index) => {
+                    // Each image + download button wrapper
+                    const imageWrapper = document.createElement('div');
+                    imageWrapper.className = 'image-wrapper';
+
+                    // Image preview
+                    const img = document.createElement('img');
+                    img.src = imgUrl;
+                    img.alt = `Image ${index + 1}`;
+                    img.className = 'preview-img';
+                    img.onclick = () => window.open(imgUrl, '_blank'); // optional
+                    imageWrapper.appendChild(img);
+
+                    // Download button
+                    const imgBtn = createDownloadButton(
+                        `Download Image ${index + 1}`,
+                        imgUrl,
+                        `${username}_${videoId}_img${index + 1}.jpg`
+                    );
+                    imageWrapper.appendChild(imgBtn);
+
+                    scrollContainer.appendChild(imageWrapper);
+                });
+
+                imageSection.appendChild(scrollContainer);
+                resultsDiv.appendChild(imageSection);
+            }
+
+            // Handle Video
+            if (content.play || content.hdplay) {
+                const videoUrl = content.hdplay || content.play;
+
+                // Video Preview
+                const videoPreview = document.createElement('video');
+                videoPreview.src = videoUrl;
+                videoPreview.controls = true;
+                videoPreview.autoplay = false;
+                videoPreview.loop = false;
+                videoPreview.width = 300;
+                videoPreview.className = 'preview-video';
+                resultsDiv.appendChild(videoPreview);
+
+                // Download Buttons
+                const videoBtn = createDownloadButton(
+                    'Download Video (MP4)',
+                    videoUrl,
+                    `${username}_${videoId}.mp4`
+                );
+                resultsDiv.appendChild(videoBtn);
+
+                if (content.cover) {
+                    const thumbPreview = document.createElement('img');
+                    thumbPreview.src = content.cover;
+                    thumbPreview.alt = 'Thumbnail';
+                    thumbPreview.className = 'preview-img';
+                    thumbPreview.style.width = '200px';
+                    thumbPreview.style.margin = '10px auto';
+                    resultsDiv.appendChild(thumbPreview);
+
+                    const thumbBtn = createDownloadButton(
+                        'Download Thunbnail (JPG)',
+                        content.cover,
+                        `${username}_${videoId}_thumbnail.jpg`
+                    );
+                    resultsDiv.appendChild(thumbBtn);
+                }
+            }
+
+            // If no video or images
+            if (!content.play && !content.images) {
+                throw new Error('No downloadable content found');
+            }
+
+        } catch (error) {
+            resultsDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Download';
+        }
     }
+
+    function createDownloadButton(text, url, filename) {
+        const btn = document.createElement('button');
+        btn.className = 'download-btn';
+        btn.textContent = text;
+        btn.onclick = (event) => downloadFile(event, url, filename, text);
+        return btn;
+    }
+
+    async function downloadFile(event, url, filename, originalText) {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = 'Downloading...';
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Fetch failed');
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }, 1000);
+
+        } catch (error) {
+            console.warn('Direct fetch failed (likely CORS), using fallback link');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.target = '_blank';
+            a.textContent = `${originalText} (Fallback - Right-click to save)`;
+            a.style.display = 'block';
+            a.style.backgroundColor = '#dc3545';
+            a.style.color = 'white';
+            a.style.padding = '12px';
+            a.style.textAlign = 'center';
+            a.style.borderRadius = '5px';
+            a.style.margin = '10px 0';
+            a.style.textDecoration = 'none';
+            a.style.fontWeight = 'bold';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    }
+
+    document.getElementById('pasteBtn').addEventListener('click', async function () {
+        const pasteBtn = this;
+        const input = document.getElementById('tiktokUrl');
     
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            updateTab(tab.dataset.tab);
-        });
+        try {
+            // Try to read from clipboard
+            const text = await navigator.clipboard.readText();
+    
+            if (text) {
+                input.value = text;
+                input.focus();
+    
+                // Optional visual feedback
+                pasteBtn.textContent = "✅ Pasted!";
+                pasteBtn.style.backgroundColor = "#28a745";
+    
+                setTimeout(() => {
+                    pasteBtn.textContent = "📋 Paste";
+                    pasteBtn.style.backgroundColor = "#6c757d";
+                }, 1500);
+            } else {
+                alert("Clipboard is empty!");
+            }
+    
+        } catch (err) {
+            // Fallback: prompt user to paste manually
+            input.focus();
+            alert("Clipboard access denied! Please paste manually (Ctrl+V).");
+        }
     });
 
-    // Initially show video tab
-    updateTab('video');
+    document.getElementById('fetchBtn').addEventListener('click', downloadContent);
 
-    // ---------------- Video Tab Section ----------------
-    document.getElementById('downloadVideoBtn').onclick = async () => {
-        const url = document.getElementById('videoUrl').value.trim();
-        resultDiv.innerHTML = '';
-        if (!url) return alert('Please enter a TikTok video link');
-
-        resultDiv.innerHTML = '<p>Fetching video...</p>';
-        try {
-            const videoRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
-            const videoData = await videoRes.json();
-            if (!videoData.data || !videoData.data.play) return resultDiv.innerHTML = '<p>Invalid TikTok video URL.</p>';
-            
-            const videoUrl = videoData.data.play;
-            let title = videoData.data.title || "tiktok_video";
-            title = title.replace(/[#@][\w]+/g, '').trim();
-            title = title.replace(/[^\w\s]/gi, '').trim();
-
-            resultDiv.innerHTML = `
-                <p class="video-title">${title}</p>
-                <video controls src="${videoUrl}" style="width:100%; border-radius:10px;"></video>
-                <button id="downloadVideo">
-                    <span class="btn-text">Download Video Without Watermark</span>
-                    <span class="spinner" style="display: none;"></span>
-                </button>
-            `;
-
-            const videoDownloadBtn = document.getElementById('downloadVideo');
-            const videoBtnText = videoDownloadBtn.querySelector('.btn-text');
-            const videoSpinner = videoDownloadBtn.querySelector('.spinner');
-
-            videoDownloadBtn.onclick = async () => {
-                videoDownloadBtn.disable = true;
-                videoSpinner.style.display = "inline-block";
-                videoBtnText.textContent = "Downloading...";
-
-                try {
-                    const fileName = title.replace(/[^\w\s]/gi, '_').substring(0, 40) + ".mp4";
-                    const response = await fetch(videoUrl);
-                    const blob = await response.blob();
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = fileName;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(link.href);
-                } catch (err) {
-                    alert("Failed to download video. Please try again.");
-                    console.error(err);
-                } finally {
-                    videoDownloadBtn.disable = false;
-                    videoSpinner.style.display = "none";
-                    videoBtnText.textContent = "Download Video Without Watermark"
-                }
-            };
-
-        } catch (err) {
-            console.error(err);
-            resultDiv.innerHTML = '<p>Failed to fetch video.</p>';
+    // Allow Enter key to submit
+    document.getElementById('tiktokUrl').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            downloadContent();
         }
-    };
+    });
 
-    // ---------------- Image Tab Section ----------------
-    document.getElementById('downloadImagesBtn').onclick = async () => {
-        const url = document.getElementById('imagesUrl').value.trim();
-        resultDiv.innerHTML = '';
-        if (!url) return alert('Please enter a TikTok images link');
-
-        resultDiv.innerHTML = '<p>Fetching images...</p>';
-        try {
-            const imgRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
-            const imgData = await imgRes.json();
-            if (!imgData.data || !imgData.data.images || imgData.data.images.length === 0) return resultDiv.innerHTML = '<p>No images found.</p>';
-
-            let title = imgData.data.title || "tiktok_images";
-            title = title.replace(/[#@][\w]+/g, '').trim();
-            title = title.replace(/[^\w\s]/gi, '').trim();
-            const safeTitle = title.replace(/[^\w\s]/gi, '_').substring(0, 40);
-
-            const container = document.createElement('div');
-            container.className = 'image-scroll-container';
-            const checkboxes = [];
-
-            imgData.data.images.forEach((imgUrl, i) => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'image-wrapper';
-
-                const imgEl = document.createElement('img');
-                imgEl.src = imgUrl;
-                imgEl.alt = `Image ${i+1}`;
-                wrapper.appendChild(imgEl);
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = true;
-                checkbox.className = 'image-checkbox';
-                wrapper.appendChild(checkbox);
-
-                container.appendChild(wrapper);
-                checkboxes.push({ checkbox, url: imgUrl });
-            });
-
-            resultDiv.innerHTML = `<p class="video-title">${title} (Images)</p>`;
-            resultDiv.appendChild(container);
-
-            const imageDownloadBtn = document.createElement('button');
-            imageDownloadBtn.innerHTML = `
-                <span class="btn-text">Download Selected Images</span>
-                <span class="spinner" style="display: none;"</span>
-            `;
-            imageDownloadBtn.style.marginTop = '10px';
-            resultDiv.appendChild(imageDownloadBtn);
-
-            const imageBtnText = imageDownloadBtn.querySelector('.btn-text');
-            const imageSpinner = imageDownloadBtn.querySelector('.spinner');
-
-            imageDownloadBtn.onclick = async () => {
-                const selectedImages = checkboxes.filter(c => c.checkbox.checked);
-                if (selectedImages.length === 0) return alert('Please select at least one image!');
-
-                imageDownloadBtn.disabled = true;
-                imageSpinner.style.display = "inline-block";
-                imageBtnText.textContent = "Downloading...";
-
-                for (let i = 0; i < selectedImages.length; i++) {
-                    try {
-                        const imgUrl = selectedImages[i].url;
-                        const response = await fetch(imgUrl);
-                        const blob = await response.blob();
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(blob);
-                        link.download = `${safeTitle}_${i+1}.jpg`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        URL.revokeObjectURL(link.href);
-                    } catch (err) {
-                        console.error('Failed to download image:', err);
-                        alert('Failed to download one of the images. Please try again.');
-                    }
-                }
-
-                imageDownloadBtn.disabled = false;
-                imageSpinner.style.display = "none";
-                imageBtnText.textContent = "Download Selected Images";
-            };
-
-        } catch (err) {
-            console.error(err);
-            resultDiv.innerHTML = '<p>Failed to fetch images.</p>';
-        }
-    };
-
-    // ---------------- Footer Section ----------------
+    // Footer Year
     document.getElementById('year').textContent = new Date().getFullYear();
 });
