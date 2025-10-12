@@ -74,6 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (content.play || content.hdplay) {
                 const videoUrl = content.hdplay || content.play;
 
+                let fileExtension = videoUrl.endsWith('.mp3') ? '.mp3' : '.mp4';
+
                 // Video Preview
                 const videoPreview = document.createElement('video');
                 videoPreview.src = videoUrl;
@@ -86,9 +88,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Download Buttons
                 const videoBtn = createDownloadButton(
-                    'Download Video (MP4)',
+                    `Download ${fileExtension === '.mp3' ? 'Audio (MP3)' : 'Video (MP4)'}`,
                     videoUrl,
-                    `${username}_${videoId}.mp4`
+                    `${username}_${videoId}${fileExtension}`
                 );
                 resultsDiv.appendChild(videoBtn);
 
