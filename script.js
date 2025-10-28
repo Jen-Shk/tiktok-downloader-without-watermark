@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const username = content.author?.unique_id? `@${content.author.unique_id}` : '@unknown_user';
             const videoId = content.id || 'unknown_id';
 
-            resultsDiv.innerHTML = '<div class="note">Preview and download your TikTok video or images below.</div>';
+            resultsDiv.innerHTML = '<div class="note">Preview and download your TikTok video or images below. Please stay in this page while downloads complete.</div>';
 
             // Handle Images (TikTok photo posts)
             if (content.images && content.images.length > 0) {
@@ -137,26 +137,56 @@ document.addEventListener("DOMContentLoaded", () => {
         const btn = event.target;
         btn.disabled = true;
         btn.textContent = 'Downloading...';
-
+    
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error('Fetch failed');
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
-
-            const a = document.createElement('a');
-            a.href = blobUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(blobUrl);
-
+    
+            const contentLength = Number(response.headers.get('content-length') || 0);
+    
+            if (response.body && 'getReader' in response.body && contentLength) {
+                const reader = response.body.getReader();
+                const chunks = [];
+                let received = 0;
+    
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    chunks.push(value);
+                    received += value.length;
+    
+                    const percent = Math.floor((received / contentLength) * 100);
+                    btn.textContent = `Downloading... ${percent}%`;  // ✅ live %
+                }
+    
+                const blob = new Blob(chunks);
+                const blobUrl = URL.createObjectURL(blob);
+    
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+            } else {
+                // fallback if stream not supported
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+            }
+    
             setTimeout(() => {
                 btn.disabled = false;
                 btn.textContent = originalText;
-            }, 1000);
-
+            }, 800);
+    
         } catch (error) {
             console.warn('Direct fetch failed (likely CORS), using fallback link');
             const a = document.createElement('a');
@@ -176,12 +206,12 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-
+    
             btn.disabled = false;
             btn.textContent = originalText;
         }
     }
-
+        
     document.getElementById('pasteBtn').addEventListener('click', async function () {
         const pasteBtn = this;
         const input = document.getElementById('tiktokUrl');
