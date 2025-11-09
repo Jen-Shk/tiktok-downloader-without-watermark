@@ -211,6 +211,41 @@ input[type="url"]:focus-visible {
     opacity: 0.6;
 }
 
+/* ================== Download Progress ================== */
+.download-container {
+    margin: 10px 0;
+}
+
+.progress-wrapper {
+    margin-top: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 4px;
+    position: relative;
+    height: 24px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius: 6px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(255, 0, 80, 0.5);
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--text);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+}
+
 /* ================== Video & Image Preview ================== */
 .preview-video {
     display: block;
