@@ -43,7 +43,6 @@ Just paste the link, and get your content instantly! Powered by **Node.js + Expr
 ## 🖼 Demo
 
 [![Preview](https://github.com/user-attachments/assets/a4cdae6f-3103-42c3-8983-843e7866e342)](https://tiktok-downloader-without-watermark.onrender.com/)
-<img width="1314" height="637" alt="TikTok Downloader Screenshot" src="https://github.com/user-attachments/assets/a4cdae6f-3103-42c3-8983-843e7866e342" />
 
 *Click the image to visit the live site.*
 
