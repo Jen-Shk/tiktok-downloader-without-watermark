@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
 const axios = require('axios');
 const path = require('path');
 const https = require('https');
@@ -12,6 +13,19 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Add Dynamic Footer Date
+app.get('/', (req, res) => {
+    const year = new Date().getFullYear();
+    const filePath = path.join(__dirname, 'public', 'index.html');
+    console.log(filePath);
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) return res.status(500).send('Error reading file');
+        const html = data.replace(/{{year}}/g, year);
+        res.send(html);
+    });
+});
+
 app.use(express.static('public'));
 
 // Helper function to generate filenames
@@ -123,11 +137,6 @@ app.get('/api/proxy', async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to download file' });
     }
-});
-
-// Serve index.html
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start server

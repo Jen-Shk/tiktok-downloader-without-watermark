@@ -169,6 +169,4 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('tiktokUrl').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') downloadContent();
     });
-
-    document.getElementById('year').textContent = new Date().getFullYear();
 });
