@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const data = await response.json();
 
-            // ✅ Node.js backend returns { success: true, data: {...} }
             if (!data.success) {
                 throw new Error(data.message || 'Invalid TikTok URL or API error');
             }
