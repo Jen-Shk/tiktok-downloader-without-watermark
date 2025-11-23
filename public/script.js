@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
         button.textContent = "Fetching...";
 
         try {
-            // ✅ Call Node.js backend instead of TikWM
             const apiUrl = `/api/download?url=${encodeURIComponent(url)}`;
             const response = await fetch(apiUrl);
             if (!response.ok) {
@@ -33,7 +32,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const videoId = content.id || 'unknown_id';
             resultsDiv.innerHTML = '<div class="note">Preview and download your TikTok video or images below.</div>';
 
-            // ✅ PREVIEW SECTION STAYS EXACTLY THE SAME
             // Handle Images (TikTok photo posts)
             if (content.images && content.images.length > 0) {
                 const imageSection = document.createElement('div');
@@ -134,15 +132,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function downloadFile(url, filename) {
-        // Use backend proxy to bypass CORS - backend handles all streaming
+        // Use backend proxy to bypass CORS
         const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
         
-        // Create anchor element for direct native download
         const a = document.createElement('a');
         a.href = proxyUrl;
         a.style.display = 'none';
-        
-        // Trigger download and cleanup
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
