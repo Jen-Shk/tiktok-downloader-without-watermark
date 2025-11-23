@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
     const year = new Date().getFullYear();
     const filePath = path.join(__dirname, 'public', 'index.html');
-    console.log(filePath);
+
     fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) return res.status(500).send('Error reading file');
         const html = data.replace(/{{year}}/g, year);
